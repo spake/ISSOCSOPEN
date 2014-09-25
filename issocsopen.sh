@@ -1,7 +1,15 @@
 #!/bin/bash
-status=`wget -q -O - issocsopen.com | egrep '(OPEN|CLOSED)' | tr -d ' '`
-if [ "$status" == OPEN -a "`cat ~/issocsopen/prevstatus`" != OPEN ]
+ISSOCSOPEN_TOKEN=""
+ISSOCSCLOSED_TOKEN=""
+
+STATUS=`wget -q -O - issocsopen.com | egrep '(OPEN|CLOSED)' | tr -d ' '`
+PREVFILE=~/issocsopen/prevstatus
+if [ "$STATUS" == OPEN -a "`cat $PREVFILE`" != OPEN ]
 then
-	curl -s --data "api_token=<API_TOKEN_HERE>" http://api.justyo.co/yoall/ > /dev/null
+	# yo ISSOCSOPEN
+	curl -s --data "api_token=$ISSOCSOPEN_TOKEN" http://api.justyo.co/yoall/ > /dev/null
+elif [ "$STATUS" == CLOSED -a "`cat $PREVFILE`" != CLOSED ]
+	# yo ISSOCSCLOSED
+	curl -s --data "api_token=$ISSOCSCLOSED_TOKEN" http://api.justyo.co/yoall/ > /dev/null
 fi
-echo "$status" > ~/issocsopen/prevstatus
+echo "$STATUS" > $PREVFILE
